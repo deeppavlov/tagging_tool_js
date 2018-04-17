@@ -1,17 +1,5 @@
-Handlebars.registerHelper("tagger", function(sentence) {
 
-    var root = document.createElement("div");
-    root.classList.add("TaggerRoot");
-    return new Handlebars.SafeString(root.outerHTML);
-});
-
-var context = {
-  "initial": "Приехал : Проспект Мира д . 101 ( вход со двора ), переписали мои данные , выспрашивали между делом с кем живу , где работаю ...".split(' ')
-};
-
-var template = $('#handlebars-demo').html();
-var templateScript = Handlebars.compile(template);
-var html = templateScript(context);
+var words = "Приехал : Проспект Мира д . 101 ( вход со двора ), переписали мои данные , выспрашивали между делом с кем живу , где работаю ...".split(' ');
 
 
 function selectionCheck (selections, left, right) {
@@ -30,6 +18,7 @@ function selectionCheck (selections, left, right) {
     return ["valid"];
 }
 
+// That function is used in Yandex.Toloka
 function makeSpan(index, text) {
     var span = document.createElement("span");
     span.setAttribute("id", next_id);
@@ -39,6 +28,7 @@ function makeSpan(index, text) {
     return span;
 }
 
+// That function is used in Yandex.Toloka
 function report(selections, words){
     var rep = [];
     var next_id = 0;
@@ -106,24 +96,15 @@ function redraw (root, selections, words) {
 }
 
 
-// function removeSelection() {
-//     if (window.getSelection) {
-//         if (window.getSelection().empty) {  // Chrome
-//             window.getSelection().empty();
-//         } else if (window.getSelection().removeAllRanges) {  // Firefox
-//             window.getSelection().removeAllRanges();}
-//     } else if (document.selection) {  // IE?
-//         document.selection.empty();}}
 
-
-$(document.body).append(html);
 var selections = [];
 
 
-var task_root = document.getElementsByClassName("TaggerRoot")[0];
-//console.dir(task_root);
+var task_root = document.getElementsByClassName("tagger")[0];
 
-redraw(task_root, selections, context.initial);
+redraw(task_root, selections, words);
+
+report(selections, words);
 
 task_root.onmouseup = function (e) {
     var s = window.getSelection();
@@ -139,7 +120,7 @@ task_root.onmouseup = function (e) {
                 return sel[0] !== c[0] || sel[1] !== c[1]
             });
             s.removeAllRanges();
-            redraw(e.currentTarget, selections, context.initial);  // TODO: context
+            redraw(e.currentTarget, selections, words);
         }
     } else {
         var r = s.getRangeAt(0);
@@ -148,24 +129,26 @@ task_root.onmouseup = function (e) {
         var left = parseInt(r.startContainer.parentElement.getAttribute("id"));
         var right = parseInt(o.getAttribute("id"));
 
-        c = selectionCheck(selections, left, right);
+        if (!isNaN(left) && !isNaN(right)) {
+            c = selectionCheck(selections, left, right);
 
-        switch (c[0]) {
-            case "invalid":
-                break;
-            case "valid":
-                selections.push([left, right]);
-                selections.sort(function (s1, s2) {
-                    return s1[0] - s2[0];
-                });
-                break;
-            case "inside":
-                selections = selections.filter(function (sel) {
-                    return sel[0] !== c[1][0] || sel[1] !== c[1][1]
-                });
-                break;
+            switch (c[0]) {
+                case "invalid":
+                    break;
+                case "valid":
+                    selections.push([left, right]);
+                    selections.sort(function (s1, s2) {
+                        return s1[0] - s2[0];
+                    });
+                    break;
+                case "inside":
+                    selections = selections.filter(function (sel) {
+                        return sel[0] !== c[1][0] || sel[1] !== c[1][1]
+                    });
+                    break;
+            }
         }
         s.removeAllRanges();
-        redraw(e.currentTarget, selections, context.initial);  // TODO: context
+        redraw(e.currentTarget, selections, words);
     }
 };
