@@ -1,0 +1,61 @@
+mark {
+  background-color: DarkOrange;
+  border-radius: 10px;
+}
+
+span {
+  font-family: "Times New Roman", Times, serif;
+  font-size: large;
+  display:inline-block;
+}
+
+.tooltiplabel {
+  font-size: 75%;
+  font-style: bold;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+    font-size: 75%;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 600px;
+    background-color: #dcdcdc;
+    color: black;
+    text-align: left;
+    border-radius: 6px;
+    padding: 10px 10px 10px 10px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.ex_addr {
+  background-color: yellow;
+  border: solid;
+  border-width: thin;
+}

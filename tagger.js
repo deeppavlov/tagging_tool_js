@@ -1,5 +1,7 @@
 
 var words = "Приехал : Проспект Мира д . 101 ( вход со двора ), переписали мои данные , выспрашивали между делом с кем живу , где работаю ...".split(' ');
+var stress = words.map(x => 1.0);
+stress.splice(2, 5, 1.5, 1.5, 1.5, 1.5, 1.5);
 
 
 function selectionCheck (selections, left, right) {
@@ -18,13 +20,13 @@ function selectionCheck (selections, left, right) {
     return ["valid"];
 }
 
-// That function is used in Yandex.Toloka
-function makeSpan(index, text) {
+function makeSpan(index, text, stress) {
     var span = document.createElement("span");
-    span.setAttribute("id", next_id);
-    span.textContent = words[next_id];
-    span.setAttribute("style", "margin-right: 2px");
-    span.setAttribute("style", "margin-left: 2px");
+    span.setAttribute("id", index);
+    span.textContent = text;
+    span.style=`margin-right: 2px;
+                margin-left: 2px;
+                font-size: ${stress}em;`;
     return span;
 }
 
@@ -56,7 +58,7 @@ function report(selections, words){
     return rep;
 }
 
-function redraw (root, selections, words) {
+function redraw (root, selections, words, stress) {
     while (root.firstChild)
         {root.removeChild(root.firstChild);}
 
@@ -68,30 +70,21 @@ function redraw (root, selections, words) {
 
         // add all words before the selection
         for (next_id; next_id<sl; next_id++){
-            var span = document.createElement("span");
-            span.setAttribute("id", next_id);
-            span.textContent = words[next_id];
-            root.appendChild(span);
+            root.appendChild(makeSpan(next_id, words[next_id], stress[next_id]));
         }
 
         // add all words of the selection
         var mark = document.createElement("mark");
         mark.setAttribute("id", sl + "_" + sr);
         for (next_id; next_id < sr+1; next_id++){
-            var span = document.createElement("span");
-            span.setAttribute("id", next_id);
-            span.textContent = words[next_id];
-            mark.appendChild(span);
+            mark.appendChild(makeSpan(next_id, words[next_id], stress[next_id]));
         }
         root.appendChild(mark)
     }
 
     // add remaining words after all selections
     for(next_id; next_id < words.length; next_id++) {
-        var span = document.createElement("span");
-        span.setAttribute("id", next_id);
-        span.textContent = words[next_id];
-        root.appendChild(span);
+        root.appendChild(makeSpan(next_id, words[next_id], stress[next_id]));
     }
 }
 
@@ -102,7 +95,7 @@ var selections = [];
 
 var task_root = document.getElementsByClassName("tagger")[0];
 
-redraw(task_root, selections, words);
+redraw(task_root, selections, words, stress);
 
 report(selections, words);
 
@@ -120,7 +113,7 @@ task_root.onmouseup = function (e) {
                 return sel[0] !== c[0] || sel[1] !== c[1]
             });
             s.removeAllRanges();
-            redraw(e.currentTarget, selections, words);
+            redraw(e.currentTarget, selections, words, stress);
         }
     } else {
         var r = s.getRangeAt(0);
@@ -149,6 +142,6 @@ task_root.onmouseup = function (e) {
             }
         }
         s.removeAllRanges();
-        redraw(e.currentTarget, selections, words);
+        redraw(e.currentTarget, selections, words, stress);
     }
 };

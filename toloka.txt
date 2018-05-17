@@ -1,0 +1,7 @@
+Toloka specifications must have following input data columns
+input
+  space-separated words list
+stress
+  space-separated word sizes in "em" (1 - for normal, 2 - for double size)
+
+output variable is called "output" which is json
