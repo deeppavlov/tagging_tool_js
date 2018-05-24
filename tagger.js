@@ -30,34 +30,6 @@ function makeSpan(index, text, stress) {
     return span;
 }
 
-// That function is used in Yandex.Toloka
-function report(selections, words){
-    var rep = [];
-    var next_id = 0;
-    for (var i=0; i<selections.length; i++){
-        var sl = selections[i][0];
-        var sr = selections[i][1];
-
-        // add all words before the selection
-        for (next_id; next_id<sl; next_id++){
-            rep.push([words[next_id], "o"]);
-        }
-
-        // add all words of the selection
-        var has_beginning = false;
-        for (next_id; next_id < sr+1; next_id++){
-            var tg = has_beginning ? 'i' : 'b';
-            has_beginning = true;
-            rep.push([words[next_id], tg]);
-        }
-    }
-    // add remaining words after all selections
-    for(next_id; next_id < words.length; next_id++) {
-        rep.push([words[next_id], "o"]);
-    }
-    return rep;
-}
-
 function redraw (root, selections, words, stress) {
     while (root.firstChild)
         {root.removeChild(root.firstChild);}
@@ -97,7 +69,6 @@ var task_root = document.getElementsByClassName("tagger")[0];
 
 redraw(task_root, selections, words, stress);
 
-report(selections, words);
 
 task_root.onmouseup = function (e) {
     var s = window.getSelection();

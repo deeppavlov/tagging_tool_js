@@ -4,11 +4,16 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
 
     var input = this.getTask().input_values.input;
     var words = input.split(' ');
-    var stress  = this.getTask().input_values.stress.split(' ');
-
-    if (words.length == stress.length) {
-        console.error('Quantity of elements in words and stress but be equal');
+    var stress = "";
+    if (typeof this.getTask().input_values.stress == 'undefined') {
+        stress = words.map(_ => 1);
+    } else {
+        stress = this.getTask().input_values.stress.split(' ');
+        if (words.length == stress.length) {
+            console.error('Quantity of elements in words and stress but be equal');
+        }
     }
+
 
     var task_id = this.getTask().id;
     var task_obj = this;
@@ -21,8 +26,7 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
     // try to restore prev results so we can analyse results in Toloka GUI
     if (prev_outputs.hasOwnProperty("output")) {
         console.dir(JSON.parse(prev_outputs.output));
-        selections = JSON.parse(prev_outputs.output).selections;
-        console.log(selections);
+        selections = JSON.parse(prev_outputs.output);
     }
 
     // we will need a reference to a task object
@@ -34,8 +38,7 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
         task_obj.setSolution({
             "task_id": task_id,
             "output_values": {
-            "output": JSON.stringify({bio: report(selections, words),
-                                      selections: selections})}});
+                "output": JSON.stringify(selections)}});
     }
 
 ////////////////////////////////////////////
@@ -66,34 +69,6 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
                       margin-left: 2px;
                       font-size: ${stress}em;`;
         return span;
-    }
-
-    // That function is used in Yandex.Toloka
-    function report(selections, words){
-        var rep = [];
-        var next_id = 0;
-        for (var i=0; i<selections.length; i++){
-            var sl = selections[i][0];
-            var sr = selections[i][1];
-
-            // add all words before the selection
-            for (next_id; next_id<sl; next_id++){
-                rep.push([words[next_id], "o"]);
-            }
-
-            // add all words of the selection
-            var has_beginning = false;
-            for (next_id; next_id < sr+1; next_id++){
-                var tg = has_beginning ? 'i' : 'b';
-                has_beginning = true;
-                rep.push([words[next_id], tg]);
-            }
-        }
-        // add remaining words after all selections
-        for(next_id; next_id < words.length; next_id++) {
-            rep.push([words[next_id], "o"]);
-        }
-        return rep;
     }
 
     function redraw (root, selections, words, stress) {
