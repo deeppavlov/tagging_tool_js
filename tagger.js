@@ -1,19 +1,19 @@
+"use strict";
 
 var words = "Приехал : Проспект Мира д . 101 ( вход со двора ), переписали мои данные , выспрашивали между делом с кем живу , где работаю ...".split(' ');
-var stress = words.map(x => 1.0);
+var stress = words.map(function (x) {
+    return 1.0;
+});
 stress.splice(2, 5, 1.5, 1.5, 1.5, 1.5, 1.5);
 
-
-function selectionCheck (selections, left, right) {
-    for (var i=0; i<selections.length; i++)
-    {
+function selectionCheck(selections, left, right) {
+    for (var i = 0; i < selections.length; i++) {
         var sl = selections[i][0];
         var sr = selections[i][1];
 
-        if (sl <= left && left <=sr && sl <=right && right <= sr)
-            return ["inside", [sl, sr]];
+        if (sl <= left && left <= sr && sl <= right && right <= sr) return ["inside", [sl, sr]];
 
-        if (sr < left || (sl > right)) continue;
+        if (sr < left || sl > right) continue;
 
         return ["invalid"];
     }
@@ -24,73 +24,68 @@ function makeSpan(index, text, stress) {
     var span = document.createElement("span");
     span.setAttribute("id", index);
     span.textContent = text;
-    span.style=`margin-right: 2px;
-                margin-left: 2px;
-                font-size: ${stress}em;`;
+    span.setAttribute('style', "margin-right: 2px; margin-left: 2px; font-size: " + stress + "em;");
     return span;
 }
 
-function redraw (root, selections, words, stress) {
-    while (root.firstChild)
-        {root.removeChild(root.firstChild);}
+function redraw(root, selections, words, stress) {
+    while (root.firstChild) {
+        root.removeChild(root.firstChild);
+    }
 
     var next_id = 0;
 
-    for (var i=0; i<selections.length; i++){
+    for (var i = 0; i < selections.length; i++) {
         var sl = selections[i][0];
         var sr = selections[i][1];
 
         // add all words before the selection
-        for (next_id; next_id<sl; next_id++){
+        for (next_id; next_id < sl; next_id++) {
             root.appendChild(makeSpan(next_id, words[next_id], stress[next_id]));
         }
 
         // add all words of the selection
         var mark = document.createElement("mark");
         mark.setAttribute("id", sl + "_" + sr);
-        for (next_id; next_id < sr+1; next_id++){
+        for (next_id; next_id < sr + 1; next_id++) {
             mark.appendChild(makeSpan(next_id, words[next_id], stress[next_id]));
         }
-        root.appendChild(mark)
+        root.appendChild(mark);
     }
 
     // add remaining words after all selections
-    for(next_id; next_id < words.length; next_id++) {
+    for (next_id; next_id < words.length; next_id++) {
         root.appendChild(makeSpan(next_id, words[next_id], stress[next_id]));
     }
 }
 
-
-
 var selections = [];
-
 
 var task_root = document.getElementsByClassName("tagger")[0];
 
 redraw(task_root, selections, words, stress);
 
-
 task_root.onmouseup = function (e) {
     var s = window.getSelection();
-    if(s.isCollapsed){
+    if (s.isCollapsed) {
         var r = s.getRangeAt(0);
-        var o = r.endContainer.parentElement;
+        var o = r.endContainer.parentNode;
 
-        if (o.parentElement.tagName === 'MARK') {
+        if (o.parentNode.tagName === 'MARK') {
 
-            var sstr = o.parentElement.id.split('_');
+            var sstr = o.parentNode.id.split('_');
             var c = [parseInt(sstr[0]), parseInt(sstr[1])];
             selections = selections.filter(function (sel) {
-                return sel[0] !== c[0] || sel[1] !== c[1]
+                return sel[0] !== c[0] || sel[1] !== c[1];
             });
             s.removeAllRanges();
             redraw(e.currentTarget, selections, words, stress);
         }
     } else {
         var r = s.getRangeAt(0);
-        var o = r.endContainer.parentElement;
+        var o = r.endContainer.parentNode;
 
-        var left = parseInt(r.startContainer.parentElement.getAttribute("id"));
+        var left = parseInt(r.startContainer.parentNode.getAttribute("id"));
         var right = parseInt(o.getAttribute("id"));
 
         if (!isNaN(left) && !isNaN(right)) {
@@ -107,7 +102,7 @@ task_root.onmouseup = function (e) {
                     break;
                 case "inside":
                     selections = selections.filter(function (sel) {
-                        return sel[0] !== c[1][0] || sel[1] !== c[1][1]
+                        return sel[0] !== c[1][0] || sel[1] !== c[1][1];
                     });
                     break;
             }
