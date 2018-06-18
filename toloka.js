@@ -6,14 +6,14 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
     var words = input.split(' ');
     var stress = "";
 
-    if (typeof this.getTask().input_values.stress == 'undefined') {
-        stress = words.map(function (x) {return 1.0;});
-    } else {
-        stress = this.getTask().input_values.stress.split(' ');
+    if (this.getTask().input_values.stress) {
+        stress = JSON.parse(this.getTask().input_values.stress);
         if (words.length == stress.length) {
             console.warn('Quantity of elements in words and stress must be equal');
             stress = words.map(function (x) {return 1.0;});
         }
+    } else {
+        stress = words.map(function (x) {return 1.0;});
     }
 
     var task_id = this.getTask().id;
@@ -24,17 +24,20 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
     // results are stored as array of 2-element arrays
     var selections = [];
 
+    if (this.getTask().input_values.initial) {
+        console.dir(this.getTask().input_values.initial);
+        selections = JSON.parse(this.getTask().input_values.initial);
+    }
+
     // try to restore prev results so we can analyse results in Toloka GUI
     if (prev_outputs.hasOwnProperty("output")) {
-        console.dir(prev_outputs.output);
-        console.dir(JSON.parse(prev_outputs.output));
         selections = JSON.parse(prev_outputs.output);
     }
 
     // we will need a reference to a task object
     var task_div = this._element.getElementsByClassName("tagger")[0];
 
-    function write_answer(selections, words) {
+    function write_answer(selections) {
         task_obj.setSolution({
             "task_id": task_id,
             "output_values": {
@@ -151,6 +154,7 @@ function redraw(root, selections, words, stress) {
                 }
             }
             s.removeAllRanges();
+            write_answer(selections);
             redraw(e.currentTarget, selections, words, stress);
         }
     };

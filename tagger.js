@@ -6,6 +6,12 @@ var stress = words.map(function (x) {
 });
 stress.splice(2, 5, 1.5, 1.5, 1.5, 1.5, 1.5);
 
+
+function write_answer(selections) {
+    console.dir(selections);
+}
+
+
 function selectionCheck(selections, left, right) {
     for (var i = 0; i < selections.length; i++) {
         var sl = selections[i][0];
@@ -108,6 +114,7 @@ task_root.onmouseup = function (e) {
             }
         }
         s.removeAllRanges();
+        write_answer(selections);
         redraw(e.currentTarget, selections, words, stress);
     }
 };
