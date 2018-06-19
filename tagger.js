@@ -85,6 +85,7 @@ task_root.onmouseup = function (e) {
                 return sel[0] !== c[0] || sel[1] !== c[1];
             });
             s.removeAllRanges();
+            write_answer(selections);
             redraw(e.currentTarget, selections, words, stress);
         }
     } else {
