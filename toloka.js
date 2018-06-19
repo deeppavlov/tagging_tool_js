@@ -8,7 +8,7 @@ exports.Task = extend(TolokaHandlebarsTask, function (options) {
 
     if (this.getTask().input_values.stress) {
         stress = JSON.parse(this.getTask().input_values.stress);
-        if (words.length == stress.length) {
+        if (words.length != stress.length) {
             console.warn('Quantity of elements in words and stress must be equal');
             stress = words.map(function (x) {return 1.0;});
         }
